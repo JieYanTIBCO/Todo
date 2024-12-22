@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Todo App</title>
+
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/semantic-ui@2.4.2/dist/semantic.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/semantic-ui@2.4.2/dist/semantic.min.js"></script>
+</head>
+
+<body>
+    <div style="margin-top: 50px;" class="ui container">
+        <!-- Header with Refresh and Delete All Buttons -->
+        <div class="ui grid">
+            <div class="eight wide column">
+                <h1 class="ui header">To Do App</h1>
+            </div>
+            <div class="right aligned eight wide column">
+                <button class="ui green button" onclick="location.reload();">Refresh</button>
+                <button class="ui red button" onclick="return confirmDeleteAll()">Delete All</button>
+            </div>
+        </div>
+
+        <!-- Add Todo Form -->
+        <form class="ui form" action="/add" method="post">
+            <div class="field">
+                <label>Todo Title</label>
+                <input type="text" name="title" placeholder="Enter Todo..." required><br>
+            </div>
+            <button class="ui blue button" type="submit">Add</button>
+        </form>
+
+        <hr>
+
+        <!-- Todos List -->
+        {% if todo_list|length == 0 %}
+        <div class="ui warning message">
+            <div class="header">No tasks found!</div>
+            <p>Add a task using the form above.</p>
+        </div>
+        {% else %}
+        {% for todo in todo_list %}
+        <div class="ui segment">
+            <p class="ui big header">{{ todo.id }} | {{ todo.title }}</p>
+
+            <!-- Status -->
+            {% if not todo.complete %}
+            <span class="ui gray label">Not Complete</span>
+            {% else %}
+            <span class="ui green label">Completed</span>
+            {% endif %}
+
+            <!-- Action Buttons -->
+            <div class="ui buttons">
+                <a class="ui blue button" href="/update/{{ todo.id }}">Toggle Status</a>
+                <a class="ui yellow button" href="/update_title/{{ todo.id }}">Update Title</a>
+                <a class="ui red button" href="/delete/{{ todo.id }}"
+                    onclick="return confirmDelete('{{ todo.title }}')">Delete</a>
+            </div>
+        </div>
+        {% endfor %}
+        {% endif %}
+    </div>
+
+    <!-- JavaScript for Delete Confirmations -->
+    <script>
+        // Confirm before deleting an individual item
+        function confirmDelete(title) {
+            return confirm(`Are you sure you want to delete the to-do item "${title}"?`);
+        }
+
+        // Confirm before deleting all items
+        function confirmDeleteAll() {
+            if (confirm("Are you sure you want to delete ALL to-do items? This action cannot be undone.")) {
+                window.location.href = "/delete_all"; // Redirect to the delete all route
+                return true;
+            }
+            return false;
+        }
+    </script>
+</body>
+
+</html>
